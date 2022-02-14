@@ -55,13 +55,13 @@ const OauthOptions = {
         },
         },
         twitter: {
-        url: "https://oauth2.googleapis.com/token?",
-        queryAuthOptions: {
-            client_id: config.twitterClientId,
-            client_secret: config.twitterClientSecret,
-            redirect_uri: config.twitterClientUri,
-            grant_type: "authorization_code",
-        },
+            url: "https://oauth2.googleapis.com/token?",
+            queryAuthOptions: {
+                client_id: config.twitterClientId,
+                client_secret: config.twitterClientSecret,
+                redirect_uri: config.twitterClientUri,
+                grant_type: "authorization_code",
+            },
         },
         facebook: {},
     },
@@ -107,7 +107,6 @@ const OauthOptions = {
                 scope: scopesArray.facebook.join(" "),
                 redirect_uri: config.facebookClientUri,
                 state: generateRandomString(16),
-
             },
         },
     },
