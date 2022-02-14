@@ -50,7 +50,7 @@ class UserController {
         };
 
         loginFromProvider = (req, res) => {
-            this.provider = req.url.split("/")[2];
+            this.provider = req.url.split("/").at(-1);
             const objProvider = OauthOptions.queryStrings[this.provider];
             const params = new URLSearchParams(objProvider.params);
             res.cookie("auth_state", objProvider.params.state, { httpOnly: true });
