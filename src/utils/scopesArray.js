@@ -6,7 +6,7 @@ const scopesArray = {
     "openid",
   ],
   twitter: ["users.read"],
-  facebook: [""],
+  facebook: ["public_profile", "email"],
 };
 
 module.exports = scopesArray;
