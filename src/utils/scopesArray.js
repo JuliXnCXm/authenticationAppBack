@@ -5,7 +5,7 @@ const scopesArray = {
     "https://www.googleapis.com/auth/userinfo.profile",
     "openid",
   ],
-  twitter: ["tweet.read", "users.read"],
+  twitter: ["users.read"],
   facebook: ["public_profile"],
 };
 
