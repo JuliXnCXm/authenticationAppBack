@@ -55,7 +55,7 @@ class UserController {
             const params = new URLSearchParams(objProvider.params);
             res.cookie("auth_state", objProvider.params.state, { httpOnly: true });
 
-            res.redirect(`${objProvider.url}${params}`);
+            res.redirect(`${objProvider.url}${params}`)
         };
 
 

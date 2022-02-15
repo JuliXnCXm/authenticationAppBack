@@ -121,7 +121,7 @@ const OauthOptions = {
             params: {
                 response_type: "code",
                 client_id: config.facebookClientId,
-                scope: scopesArray.facebook.join(""),
+                scope: scopesArray.facebook.join(" "),
                 redirect_uri: config.facebookClientUri,
                 state: generateRandomString(16),
             },
