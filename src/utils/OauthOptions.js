@@ -26,7 +26,7 @@ const OauthOptions = {
         },
         twitter: {
         options: {
-            url: "https://api.twitter.com/2/users/me",
+            url: "https://api.twitter.com/2/users/me?expansions=pinned_tweet_id&user.fields=id,name,username,description,profile_image_url",
             token_type: "Bearer",
             headers: {
             "user-agent": "node.js",
@@ -36,8 +36,8 @@ const OauthOptions = {
         },
         facebook: {
         options: {
-            url: "https://graph.facebook.com/me",
-            token_type: "token",
+            url: "https://graph.facebook.com/v13.0/me?fields=id,name,email,picture",
+            token_type: "Bearer",
             headers: {
             "user-agent": "node.js",
             },
@@ -64,12 +64,13 @@ const OauthOptions = {
         },
         },
         twitter: {
-        url: "https://graph.facebook.com/v13.0/oauth/access_token?",
+        url: "https://api.twitter.com/2/oauth2/token?",
         queryAuthOptions: {
             client_id: config.twitterClientId,
             client_secret: config.twitterClientSecret,
             redirect_uri: config.twitterClientUri,
             grant_type: "authorization_code",
+            code_verifier: "challenge",
         },
         },
         facebook: {
@@ -111,7 +112,7 @@ const OauthOptions = {
             scope: scopesArray.twitter.join(" "),
             redirect_uri: config.twitterClientUri,
             state: generateRandomString(16),
-            code_challenge: generateRandomString(128),
+            code_challenge: "challenge",
             code_challenge_method: "plain",
         },
         },

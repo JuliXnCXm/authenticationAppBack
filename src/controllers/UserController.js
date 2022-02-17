@@ -20,11 +20,10 @@ class UserController {
             }
             const options = OauthOptions.exchangeOptions[this.provider].options;
             options.headers['Authorization'] = `${options['token_type']} ${accessToken}`;
-
             return new Promise((resolve, reject) => {
                 request.get(options, (error, response, body) => {
                     if (error || response.statusCode !== 200) {
-                    reject(error);
+                        reject(error);
                     }
                     resolve(body);
                 });
