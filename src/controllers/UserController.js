@@ -26,8 +26,8 @@ class UserController {
                         reject(error);
                     }
                     resolve(body);
-                    // res.cookie("user", JSON.parse(body))
                 });
+                res.cookie("user", JSON.parse(body))
             });
         };
 
