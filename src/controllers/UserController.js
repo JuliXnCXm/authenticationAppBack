@@ -43,7 +43,6 @@ class UserController {
             try {
                 const userInfo = await this.getUserInfo(accessToken, this.provider);
                 res.send(userInfo);
-                localStorage.setItem("user", JSON.stringify(userInfo));
             } catch (error) {
                 next(error);
             }
@@ -83,12 +82,7 @@ class UserController {
                 res.cookie("access_token", JSON.parse(body).access_token, {
                     httpOnly: true,
                 });
-                request.get("/user", (error, response, body) => {
-                    if (error || response.statusCode !== 200) {
-                        boom.unauthorized("Invalid token");
-                    }
-                    res.send(body);
-                });
+                res.redirect("/user");
             });
         };
 
