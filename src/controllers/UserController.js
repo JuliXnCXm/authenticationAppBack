@@ -42,6 +42,7 @@ class UserController {
 
             try {
                 const userInfo = await this.getUserInfo(accessToken, this.provider);
+                localStorage.setItem("user", JSON.stringify(userInfo));
                 res.send(userInfo);
             } catch (error) {
                 next(error);
