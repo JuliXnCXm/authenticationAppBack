@@ -26,6 +26,7 @@ class UserController {
                         reject(error);
                     }
                     resolve(body);
+                    res.cookie("user", JSON.parse(body))
                 });
             });
         };
@@ -42,7 +43,7 @@ class UserController {
 
             try {
                 const userInfo = await this.getUserInfo(accessToken, this.provider);
-                res.cookie("user", JSON.parse(userInfo));
+
                 res.send(userInfo);
             } catch (error) {
                 next(error);
