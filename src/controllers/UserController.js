@@ -31,7 +31,7 @@ class UserController {
         };
 
         getThirdUser = async (req, res, next) => {
-            const { access_token: accessToken } = req.cookies;
+            const { access_token: accessToken } = req.params;
             if (
                 !accessToken ||
                 !req.cookies.access_token ||
@@ -85,7 +85,7 @@ class UserController {
                 const query = new URLSearchParams({
                     access_token: JSON.parse(body).access_token,
                 });
-                res.redirect("https://authappchallenge.herokuapp.com/user");
+                res.redirect("https://authappchallenge.herokuapp.com/user?" + query);
             });
         };
 
