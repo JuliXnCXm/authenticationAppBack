@@ -31,10 +31,10 @@ class UserController {
         };
 
         getThirdUser = async (req, res, next) => {
-            const { access_token: accessToken } = req.query;
+            const { access_token: accessToken } = req.cookies;
             if (
                 !accessToken ||
-                !req.query.access_token ||
+                !req.cookies.access_token ||
                 !accessToken === undefined
             ) {
             return res.redirect("/");
