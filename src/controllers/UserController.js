@@ -85,7 +85,7 @@ class UserController {
                 const query = new URLSearchParams({
                     access_token: JSON.parse(body).access_token,
                 });
-                res.redirect("https://authappchallenge.herokuapp.com/user?" + query);
+                res.redirect("https://authappchallenge.herokuapp.com/user");
             });
         };
 
