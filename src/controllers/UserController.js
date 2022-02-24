@@ -57,7 +57,6 @@ class UserController {
             res.redirect(`${objProvider.url}${params}`)
         };
 
-
         callbackProvider = (req, res, next) => {
             const { code, state } = req.query;
             if (state === null || state !== req.cookies.auth_state) {
