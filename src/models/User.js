@@ -5,7 +5,7 @@ const UserSchema = joi.object().keys({
     email: joi.string().email().required(),
     password: joi
         .string()
-        .regex(/ ^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{8,}$/)
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{8,}$/)
         .required(),
     name: joi.string().required(),
     lastname: joi.string(),
