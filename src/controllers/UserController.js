@@ -122,7 +122,16 @@ class UserController {
             if (!error) {
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(value.password, salt, (err, hash) => {
-                User.create({ email: value.email, password: hash }, (err, data) => {
+                User.create({
+                    name: value.name,
+                    lastname: value.lastname,
+                    email: value.email,
+                    password: hash,
+                    provider: value.provider,
+                    description: value.description,
+                    phone: value.phone,
+                    picture: value.picture,
+                }, (err, data) => {
                     if (err) {
                     res.status(500).send({
                         message: "Error al registrar",
