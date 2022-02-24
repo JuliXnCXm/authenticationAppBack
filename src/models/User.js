@@ -39,8 +39,8 @@ const createUser = new Schema({
     picture: {
         type: String,
     },
-    createdAt: Date.now(),
-    updatedAt: Date.now()
+    createdAt: Date,
+    updatedAt: Date
 }, {Collection: 'users'});
 
 const User = model('User', createUser);
