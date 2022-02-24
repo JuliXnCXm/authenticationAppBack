@@ -131,6 +131,8 @@ class UserController {
                     description: value.description,
                     phone: value.phone,
                     picture: value.picture,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
                 }, (err, data) => {
                     if (err) {
                     res.status(500).send({
