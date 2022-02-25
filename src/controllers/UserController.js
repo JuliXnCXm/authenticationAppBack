@@ -8,8 +8,6 @@ const request = require("request");
 const { OauthOptions } = require("../utils/OauthOptions");
 const URLSearchParams = require("@ungap/url-search-params");
 
-
-
 class UserController {
     constructor() {
         this.provider = "";
@@ -20,15 +18,76 @@ class UserController {
             }
             const options = OauthOptions.exchangeOptions[this.provider].options;
             options.headers['Authorization'] = `${options['token_type']} ${accessToken}`;
-            return new Promise((resolve, reject) => {
-                request.get(options, (error, response, body) => {
-                    if (error || response.statusCode !== 200) {
-                        reject(error);
-                    }
-                    resolve(body);
+            request.get(options, (error, response, body) => {
+                if (error || response.statusCode !== 200) {
+                    return Promise.reject(boom.unauthorized('Invalid token'));
+                }
+                return new Promise((resolve, reject) => {
+                    userObj = this.UserContructor(body);
+                    User.findOne({ email: userObj.email }, (err, user) => {
+                        if (!user) {
+
+                            User.create(userObj, (err, user) => {
+                                if ( !err) {
+                                    resolve(user);
+                                } else {
+                                    return null
+                                }
+                            })
+                        }
+                    })
                 });
             });
         };
+
+        UserContructor = (objUser) => {
+            let userObj = {
+                name: "",
+                lastname: "",
+                email: "",
+                picture: "",
+                provider: this.provider,
+                description: "",
+                phone: "",
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }
+            switch (this.provider) {
+                case "google":
+                    userObj.name = objUser.name;
+                    userObj.lastname = objUser.family_name;
+                    userObj.email = objUser.email;
+                    userObj.picture = objUser.picture;
+                    break;
+
+                case "facebook":
+                    userObj.name = objUser.name;
+                    userObj.email = objUser.email;
+                    userObj.picture = objUser.picture.data.url;
+                    break;
+
+                case "twitter":
+                    userObj.name = objUser.name;
+                    userObj.lastname = objUser.username;
+                    userObj.email = objUser.email;
+                    userObj.description = objUser.description;
+                    userObj.picture = objUser.profile_image_url;
+                    break;
+
+                case "github":
+                    userObj.name = objUser.name;
+                    userObj.lastname = objUser.login;
+                    userObj.email = objUser.email;
+                    userObj.description = objUser.bio;
+                    userObj.picture = objUser.avatar_url;
+                    break;
+
+                default:
+                    break;
+            }
+            return userObj;
+        }
+
 
         getThirdUser = async (req, res, next) => {
             const { access_token: accessToken } = req.query;
@@ -41,7 +100,11 @@ class UserController {
             }
 
             try {
-                const userInfo = await this.getUserInfo(accessToken, this.provider);
+                if (this.provider !== "local") {
+                    const userInfo = await this.getUserInfo(accessToken, this.provider);
+                    res.json({user:userInfo});
+                }
+                const userInfo = this.getUser(req);
                 res.json({user: userInfo});
             } catch (error) {
                 next(error);
@@ -90,27 +153,28 @@ class UserController {
 
         login = (req, res) => {
             let user = req.body;
+            this.provider = "local";
             const { error, value } = UserSchema.validate(user);
             if (!error) {
             User.findOne({ email: value.email }, (err, user) => {
                 if (!user) {
                 res.status(404).send({
-                    message: "Usuario no encontrado",
+                    message: "Error al obtener usuario o usuario no encontrado",
                 });
                 } else {
-                bcrypt.compare(value.password, user.password, (err, result) => {
-                    if (result === false) {
-                    boom.unauthorized("Contraseña incorrecta");
-                    } else {
-                    let token = jwt.sign({ user: user }, config.privateKey, {
-                        expiresIn: "1h",
+                    bcrypt.compare(value.password, user.password, (err, result) => {
+                        if (result === false) {
+                            boom.unauthorized("Contraseña incorrecta");
+                        } else {
+                            let token = jwt.sign({ user: user }, config.privateKey, {
+                                expiresIn: "1h",
+                            });
+                            res.status(200).send({
+                                message: "Usuario autenticado",
+                                token: token,
+                            });
+                        }
                     });
-                    res.status(200).send({
-                        message: "Usuario autenticado",
-                        token: token,
-                    });
-                    }
-                });
                 }
             });
             }
@@ -118,52 +182,75 @@ class UserController {
 
         register = (req, res) => {
             let user = req.body;
+            this.provider = "local";
             const { error, value } = UserSchema.validate(user);
             if (!error) {
-            bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(value.password, salt, (err, hash) => {
-                User.create({
-                    name: value.name,
-                    lastname: value.lastname,
-                    email: value.email,
-                    password: hash,
-                    provider: value.provider,
-                    description: value.description,
-                    phone: value.phone,
-                    picture: value.picture,
-                    createdAt: Date.now(),
-                    updatedAt: Date.now(),
-                }, (err, data) => {
-                    if (err) {
-                    res.status(500).send({
-                        message: "Error al registrar",
+                bcrypt.genSalt(10, (err, salt) => {
+                    bcrypt.hash(value.password, salt, (err, hash) => {
+                        User.findOne({email: value.email}, (err, user) => {
+                            if (!user) {
+                                User.create({
+                                    name: value.name,
+                                    lastname: value.lastname,
+                                    email: value.email,
+                                    password: hash,
+                                    provider: this.provider,
+                                    description: value.description,
+                                    phone: value.phone,
+                                    picture: value.picture,
+                                    createdAt: Date.now(),
+                                    updatedAt: Date.now(),
+                                }, (err, data) => {
+                                    if (err) {
+                                    res.status(500).send({
+                                        message: "Error al registrar",
+                                    });
+                                    } else {
+                                    if (data != null) {
+                                        let token = jwt.sign({ user: data }, config.privateKey, {
+                                        expiresIn: "1h",
+                                        });
+                                        res.status(200).send({
+                                        message: "Usuario registrado",
+                                        token: token,
+                                        });
+                                    } else {
+                                        res.status(404).send({
+                                        message: "Usuario no registrado",
+                                        });
+                                    }
+                                    }
+                                });
+                            } else {
+                                return res.status(500).send({
+                                    message: "Usuario ya registrado",
+                                })
+                            }
+                        })
                     });
-                    } else {
-                    if (data != null) {
-                        console.log(data);
-                        let token = jwt.sign({ user: data }, config.privateKey, {
-                        expiresIn: "1h",
-                        });
-                        res.status(200).send({
-                        message: "Usuario registrado",
-                        token: token,
-                        });
-                    } else {
-                        res.status(404).send({
-                        message: "Usuario no registrado",
-                        });
-                    }
-                    }
                 });
-                });
-            });
             } else {
-            res.status(400).send({
-                message: "Error al registrar",
-                info: error,
-            });
+                res.status(400).send({
+                    message: "Error al registrar",
+                    info: error,
+                });
             }
         };
+
+        getUser = (req, res) => {
+            User.findOne({ email: req.body.email }, (err, user) => {
+                if (err) {
+                    res.status(500).send({
+                        message: "Error al obtener usuario o usuario no encontrado",
+                    });
+                } else {
+                    res.status(200).send({
+                        message: "Usuario obtenido",
+                        user: user,
+                    });
+                }
+            })
+        }
 }
 
 module.exports = UserController;
