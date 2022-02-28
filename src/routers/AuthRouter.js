@@ -1,7 +1,8 @@
 const {Router } = require('express');
+const AuthService = require('../services/AuthService');
+const OAuthService = require('../services/OAuthService');
+const TokenController = require('../controllers/TokenController');
 const UserController = require('../controllers/UserController');
-
-
 class AuthRouter {
     constructor() {
         this.router = Router();
@@ -9,23 +10,32 @@ class AuthRouter {
     }
 
     #config() {
+        const objAuth = new AuthService()
+        const objOAuth = new OAuthService()
+        const objToken = new TokenController()
         const objUser = new UserController()
-        this.router.post('/api/register' , objUser.register);
-        this.router.post('/api/login' , objUser.login);
         this.router.get('/', (req, res) => {
             res.send('Hello World');
         });
-        this.router.get('/user', objUser.getThirdUser);
+        this.router.get('/user', objToken.verifyToken);
+        this.router.post("/api/register", objAuth.register);
+        this.router.post("/api/login", objAuth.login);
+        this.router.get('/oauth/login/user', objOAuth.exchangeUserLogin);
+        this.router.get('/oauth/register/user', objOAuth.exchangeUserRegister);
         //loginProvider
-        this.router.get('/login/github', objUser.loginFromProvider);
-        this.router.get('/login/google', objUser.loginFromProvider);
-        this.router.get('/login/twitter', objUser.loginFromProvider);
-        this.router.get('/login/facebook', objUser.loginFromProvider);
+        this.router.get("/Oauth/github/:state", objOAuth.accessFromProvider);
+        this.router.get("/Oauth/google/:state", objOAuth.accessFromProvider);
+        this.router.get("/Oauth/twitter/:state", objOAuth.accessFromProvider);
+        this.router.get("/Oauth/facebook/:state", objOAuth.accessFromProvider);
         //callbackProvider
-        this.router.get('/auth/github/callback',objUser.callbackProvider);
-        this.router.get("/auth/google/callback",  objUser.callbackProvider);
-        this.router.get('/auth/twitter/callback', objUser.callbackProvider);
-        this.router.get('/auth/facebook/callback', objUser.callbackProvider);
+        this.router.get("/auth/github/callback", objOAuth.callbackProvider);
+        this.router.get("/auth/google/callback", objOAuth.callbackProvider);
+        this.router.get("/auth/twitter/callback", objOAuth.callbackProvider);
+        this.router.get("/auth/facebook/callback", objOAuth.callbackProvider);
+        //updateUser
+        this.router.put("/api/user/:id", objUser.updateUser);
+        //deleteUser
+        this.router.delete("/api/user/:id", objUser.deleteUser);
     }
 }
 

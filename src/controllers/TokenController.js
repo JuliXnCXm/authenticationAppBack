@@ -8,9 +8,12 @@ class TokenController {
 
     verifyToken(req, res, next) {
         let token = this.getToken(req);
-        let decode = jwt.decode(token, config.privateKey);
-        if (decode != null) {
-            next()
+        let decode = jwt.verify(token, config.privateKey);
+        if (decode.user != null) {
+            res.status(200).send({
+                message: "Token valido",
+                user: decode.user
+            })
         } else {
             res.status(401).send({
                 message: 'Token is not valid'
@@ -20,9 +23,13 @@ class TokenController {
 
     getToken(req, res, next) {
         let token = null
-        let authorization =  req.headers.authorization;
-        if(authorization && authorization.split(' ')[0] === 'Bearer') {
-            token = authorization.split(' ')[1];
+        // let authorization = req.headers.authorization;
+        let authorization = req.query.token;
+        // if(authorization && authorization.split(' ')[0] === 'Bearer') {
+        //     token = authorization.split(' ')[1];
+        // }
+        if(authorization) {
+            token = authorization;
         }
         return token;
     }
