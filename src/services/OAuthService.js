@@ -92,8 +92,7 @@ class OAuthService {
                     });
                     res.setHeader("Authorization","Bearer " + token);
                     res.status(200).send({msg: "user logged"});
-                    // res.redirect(`${config.clientSideUrl}/user?token=${token}`);
-                    res.redirect(`/user?token=${token}`);
+                    res.redirect(`${config.clientSideUrl}/user?token=${token}`);
                 } else {
                     res.status(401).json({
                         error: err,
@@ -134,8 +133,7 @@ class OAuthService {
                                         );
                                     res.setHeader("Authorization","Bearer " + token);
                                     res.status(200);
-                                    // res.redirect(`${config.clientSideUrl}/user?token=${token}`);
-                                    res.redirect(`/user?token=${token}`);
+                                    res.redirect(`${config.clientSideUrl}/user?token=${token}`);
                                 } else {
                                     res.status(401).json({
                                     error: err,

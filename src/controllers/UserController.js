@@ -1,6 +1,8 @@
 const {User} = require("../models/User");
 const moment = require("moment");
 const jwt = require("jsonwebtoken");
+const { config } = require("../config/config");
+
 
 class UserController {
 
@@ -25,7 +27,7 @@ class UserController {
                     res.status(200).send({
                         message: "user updated",
                     });
-                    res.redirect(`/user?token=${token}`);
+                    res.redirect(`${config.clientSideUrl}/user?token=${token}`);
                 }
             }
         })
@@ -43,12 +45,13 @@ class UserController {
                     res.status(404).send({
                         message: "No se ha podido eliminar el usuario",
                     });
-                    res.redirect(`/user?token=${token}`);
+                    res.redirect("/");
+
                 } else {
                     res.status(200).send({
                         message: "user deleted",
                     });
-                    res.redirect(`/`);
+                    res.redirect("/");
                 }
             }
         })

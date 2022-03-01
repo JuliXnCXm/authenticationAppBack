@@ -23,13 +23,9 @@ class TokenController {
 
     getToken(req, res, next) {
         let token = null
-        // let authorization = req.headers.authorization;
-        let authorization = req.query.token;
-        // if(authorization && authorization.split(' ')[0] === 'Bearer') {
-        //     token = authorization.split(' ')[1];
-        // }
-        if(authorization) {
-            token = authorization;
+        let authorization = req.headers.authorization;
+        if(authorization && authorization.split(' ')[0] === 'Bearer') {
+            token = authorization.split(' ')[1];
         }
         return token;
     }

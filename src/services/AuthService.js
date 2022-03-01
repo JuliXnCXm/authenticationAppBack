@@ -14,31 +14,28 @@ class AuthService {
     login = (req, res) => {
         let user = req.body;
         this.provider = "local";
-        const { error, value } = UserSchema.validate(user);
-        if (!error) {
-        User.findOne({ email: value.email }, (err, user) => {
-            if (!user) {
+        User.findOne({ email: user.email }, (err, data) => {
+            if (!data) {
             res.status(404).send({
                 message: "Error al obtener usuario o usuario no encontrado",
             });
             } else {
-                bcrypt.compare(value.password, user.password, (err, result) => {
+                bcrypt.compare(user.password, data.password, (err, result) => {
                     if (result === false) {
                     boom.unauthorized("Contraseña incorrecta");
                     } else {
-                    let token = jwt.sign({ user: user }, config.privateKey, {
+                    let token = jwt.sign({ user: data }, config.privateKey, {
                         expiresIn: moment().add(14, "days").unix(),
                     });
-                    // res.redirect(`${config.clientSideUrl}/user?token=${token}`)
                     res.status(200).send({
                         message: "Usuario autenticado",
                     });
-                    res.redirect(`/user?token=${token}`);
+                    res.redirect(`${config.clientSideUrl}/user?token=${token}`)
                     }
                 });
             }
         });
-        }
+
     };
 
     register = (req, res) => {
@@ -60,11 +57,10 @@ class AuthService {
                                         expiresIn: moment().add(14, "days").unix(),
                                     }
                                 );
-                                // res.redirect(`${config.clientSideUrl}/user?token=${token}`);
                                 res.status(200).json({
                                     message: "Usuario creado",
                                 })
-                                res.redirect(`/user?token=${token}`);
+                                res.redirect(`${config.clientSideUrl}/user?token=${token}`);
                             } else {
                                 res.status(401).send({
                                     message: "Error al registrar usuario",
