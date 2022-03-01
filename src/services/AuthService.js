@@ -29,8 +29,8 @@ class AuthService {
                     });
                     res.status(200).send({
                         message: "Usuario autenticado",
+                        token: token,
                     });
-                    res.redirect(`${config.clientSideUrl}/user?token=${token}`)
                     }
                 });
             }
@@ -59,20 +59,18 @@ class AuthService {
                                 );
                                 res.status(200).json({
                                     message: "Usuario creado",
+                                    token: token,
                                 })
-                                res.redirect(`${config.clientSideUrl}/user?token=${token}`);
                             } else {
                                 res.status(401).send({
                                     message: "Error al registrar usuario",
                                 });
-                                res.redirect("/");
                                 }
                             });
                     } else {
                         res.status(401).send({
                             message: "Error user already exists",
                         });
-                        res.redirect("/");
                     }
                 })
             });
