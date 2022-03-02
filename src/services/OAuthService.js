@@ -90,15 +90,12 @@ class OAuthService {
                     {
                         expiresIn: moment().add(14, "days").unix(),
                     });
-                    res.setHeader("Authorization","Bearer " + token);
-                    res.status(200).send({msg: "user logged"});
-                    res.redirect(`${config.clientSideUrl}/user?token=${token}`);
+                    res.status(200).send({msg: "user logged", token: token});
                 } else {
                     res.status(401).json({
                         error: err,
                         msg:"Error al obtener usuario o usuario no encontrado"
                     })
-                    res.redirect("/");
                 }
             });
         } catch (error) {
@@ -131,15 +128,16 @@ class OAuthService {
                                             .unix(),
                                         }
                                         );
-                                    res.setHeader("Authorization","Bearer " + token);
-                                    res.status(200);
-                                    res.redirect(`${config.clientSideUrl}/user?token=${token}`);
+                                    res.status(200).json({
+                                        msg: "user created",
+                                        token: token
+                                    });
                                 } else {
                                     res.status(401).json({
                                     error: err,
                                     msg: "Error al crear el usuario o usuario ya existente",
                                     });
-                                    res.redirect("/");
+
                                 }
                             });
                         } else {
@@ -147,14 +145,12 @@ class OAuthService {
                                 error: err,
                                 msg:"Error al obtener usuario o usuario no encontrado"
                             })
-                            res.redirect("/");
                         }
                     } else {
                         res.status(401).json({
                             error: err,
                             msg:"Error al obtener usuario o usuario no encontrado"
                         })
-                        res.redirect("/");
                     }
                 })
 

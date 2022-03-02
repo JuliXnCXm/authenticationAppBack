@@ -26,8 +26,8 @@ class UserController {
                     });
                     res.status(200).send({
                         message: "user updated",
+                        token: token
                     });
-                    res.redirect(`${config.clientSideUrl}/user?token=${token}`);
                 }
             }
         })
@@ -51,7 +51,6 @@ class UserController {
                     res.status(200).send({
                         message: "user deleted",
                     });
-                    res.redirect("/");
                 }
             }
         })
