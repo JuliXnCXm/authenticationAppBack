@@ -35,7 +35,7 @@ class AuthRouter {
         //updateUser
         this.router.put("/api/user/:id", objUser.updateUser);
         //deleteUser
-        this.router.delete("/api/user/:id", objUser.deleteUser);
+        this.router.delete("/api/user/delete/:id", objUser.deleteUser);
     }
 }
 

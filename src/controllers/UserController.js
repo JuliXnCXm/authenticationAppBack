@@ -34,7 +34,6 @@ class UserController {
     }
     deleteUser = (req, res) => {
         let id = req.params.id;
-        let token = req.headers.authorization;
         User.findByIdAndRemove(id, (err, userRemoved) => {
             if (err) {
                 res.status(500).send({
