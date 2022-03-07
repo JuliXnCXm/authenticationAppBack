@@ -6,8 +6,8 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, "../storage/img"));
   },
   filename: (req, file, cb) => {
-    let formContentFile = JSON.parse(req.body.fileForm);
-    cb(null, formContentFile.label + "." + file.mimetype.split("/")[1]);
+    console.log(file);
+    cb(null, file.originalname + "." + file.mimetype.split("/")[1]);
   },
 });
 

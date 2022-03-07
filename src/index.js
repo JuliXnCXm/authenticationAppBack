@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const upload = require("./utils/Storage");
 
 //imports
 const { config } = require('./config/config');
@@ -23,6 +24,9 @@ class Server {
         this.app.use(cors());
         this.app.use(express.json());
         this.app.use(cookieParser());
+        this.app.use(upload.single("photo"));
+        //static files
+        this.app.use(express.static(path.join(__dirname, "storage")));
         //creating routes
         const authR = new AuthRouter();
         //mounting routes

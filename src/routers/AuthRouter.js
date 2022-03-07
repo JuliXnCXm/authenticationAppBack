@@ -14,14 +14,18 @@ class AuthRouter {
         const objOAuth = new OAuthService()
         const objToken = new TokenController()
         const objUser = new UserController()
+
         this.router.get('/', (req, res) => {
             res.send('Hello World');
         });
         this.router.get('/user', objToken.verifyToken);
         this.router.post("/api/register", objAuth.register);
         this.router.post("/api/login", objAuth.login);
+        this.router.post("/api/photo", objUser.addPhoto);
+        this.router.get('/user/:photoname', objUser.getPhoto);
         this.router.get('/oauth/login/user', objOAuth.exchangeUserLogin);
         this.router.get('/oauth/register/user', objOAuth.exchangeUserRegister);
+
         //loginProvider
         this.router.get("/Oauth/github/:state", objOAuth.accessFromProvider);
         this.router.get("/Oauth/google/:state", objOAuth.accessFromProvider);

@@ -35,7 +35,6 @@ class AuthService {
                 });
             }
         });
-
     };
 
     register = (req, res) => {

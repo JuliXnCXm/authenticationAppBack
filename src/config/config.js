@@ -9,6 +9,7 @@ const config = {
   dbName: process.env.DB_NAME,
   privateKey: process.env.PRIVATE_KEY,
   clientSideUrl: process.env.CLIENT_SIDE_URL,
+  url: process.env.BACK_URL,
   //GITHUB
   githubClientId: process.env.GITHUB_CLIENT_ID,
   githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
