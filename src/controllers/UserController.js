@@ -59,17 +59,14 @@ class UserController {
 
     getPhoto = async (req, res) => {
         let { photoname } = req.params;
-        console.log(photoname);
         const photo = await Photo.find({ photoname: photoname });
-        console.log(photo);
         res.sendFile(path.join(__dirname, `/../storage/img/${photoname}`));
     };
 
     addPhoto = (req, res) => {
+        console.log(req)
         const objToken = new TokenController();
         let user = jwt.decode(objToken.getToken(req), config.privateKey);
-        console.log(new Date());
-        console.log(`${config.url}${req.file.filename}`);
         Photo.create(
         {
             photoname: req.file.originalname,
