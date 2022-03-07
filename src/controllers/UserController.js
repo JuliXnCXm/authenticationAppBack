@@ -9,9 +9,13 @@ const TokenController = require( "./TokenController" );
 
 class UserController {
     updateUser = (req, res) => {
-        let token = req.headers.authorization;
+        const objToken = new TokenController();
+        let token = objToken.getToken(req);
         let user = req.body;
         let id = req.params.id;
+        console.log(user);
+        console.log(id);
+        console.log(token);
         Photo.findOne({user_id: id}, (err, data) => {
             if(data) {
                 user.picture =data.photourl
