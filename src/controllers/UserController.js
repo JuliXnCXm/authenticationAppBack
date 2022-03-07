@@ -62,7 +62,7 @@ class UserController {
         console.log(photoname);
         const photo = await Photo.find({ photoname: photoname });
         console.log(photo);
-        res.sendFile(path.join(__dirname, `/../storage/img/${photo.photoname}`));
+        res.sendFile(path.join(__dirname, `/../storage/img/${photoname}`));
     };
 
     addPhoto = (req, res) => {
