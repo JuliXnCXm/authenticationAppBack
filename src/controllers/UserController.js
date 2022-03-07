@@ -58,11 +58,10 @@ class UserController {
     };
 
     getPhoto = async (req, res) => {
-        console.log(req)
         let { photoname } = req.params;
         console.log(photoname);
-        console.log(req.params);
         const photo = await Photo.find({ photoname: photoname });
+        console.log(photo);
         res.sendFile(path.join(__dirname, `/../storage/img/${photo.photoname}`));
     };
 
