@@ -8,7 +8,7 @@ const UserSchema = joi.object().keys({
         .regex(new RegExp("^[a-zA-Z0-9]{8,32}$"))
         .optional()
         .allow(""),
-    name: joi.string().required(),
+    name: joi.string().optional().allow(""),
     lastname: joi.string().optional().allow(""),
     provider: joi.string(),
     description: joi.string().optional().allow(""),

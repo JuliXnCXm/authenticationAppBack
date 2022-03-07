@@ -133,6 +133,29 @@ class UserController {
             }
         })
     };
+
+    getUser = (req, res) => {
+        const objToken = new TokenController();
+        let user = objToken.verifyToken(req);
+        User.findById(user._id, (err, user) => {
+            if (err) {
+            res.status(500).send({
+                message: "Error al devolver los datos",
+            });
+            } else {
+            if (!user) {
+                res.status(404).send({
+                message: "No hay usuarios",
+                });
+            } else {
+                res.status(200).send({
+                message: "Usuario devuelto",
+                user,
+                });
+            }
+            }
+        })
+    }
 }
 
 module.exports = UserController;

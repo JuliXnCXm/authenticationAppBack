@@ -1,7 +1,6 @@
 const {Router } = require('express');
 const AuthService = require('../services/AuthService');
 const OAuthService = require('../services/OAuthService');
-const TokenController = require('../controllers/TokenController');
 const UserController = require('../controllers/UserController');
 class AuthRouter {
     constructor() {
@@ -12,13 +11,12 @@ class AuthRouter {
     #config() {
         const objAuth = new AuthService()
         const objOAuth = new OAuthService()
-        const objToken = new TokenController()
         const objUser = new UserController()
 
         this.router.get('/', (req, res) => {
             res.send('Hello World');
         });
-        this.router.get('/user', objToken.verifyToken);
+        this.router.get('/user', objUser.getUser);
         this.router.post("/api/register", objAuth.register);
         this.router.post("/api/login", objAuth.login);
         this.router.post("/api/photo", objUser.addPhoto);
