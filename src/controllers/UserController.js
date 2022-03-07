@@ -12,27 +12,32 @@ class UserController {
         let token = req.headers.authorization;
         let user = req.body;
         let id = req.params.id;
-        User.findByIdAndUpdate(id, user, { new: true }, (err, userUpdated) => {
-        if (err) {
-            res.status(500).send({
-            message: "Error al actualizar el usuario",
-            });
-        } else {
-            if (!userUpdated) {
-            res.status(404).send({
-                message: "No se ha podido actualizar el usuario",
-            });
-            } else {
-            token = jwt.sign({ user: userUpdated }, config.privateKey, {
-                expiresIn: moment().add(14, "days").unix(),
-            });
-            res.status(200).send({
-                message: "user updated",
-                token: token,
-            });
+        Photo.findOne({user_id: id}, (err, data) => {
+            if(data) {
+                user.picture =data.photourl
+                User.findByIdAndUpdate(id, user, { new: true }, (err, userUpdated) => {
+                if (err) {
+                    res.status(500).send({
+                    message: "Error al actualizar el usuario",
+                    });
+                } else {
+                    if (!userUpdated) {
+                        res.status(404).send({
+                            message: "No se ha podido actualizar el usuario",
+                        });
+                    } else {
+                        token = jwt.sign({ user: userUpdated }, config.privateKey, {
+                            expiresIn: moment().add(14, "days").unix(),
+                        });
+                        res.status(200).send({
+                            message: "user updated",
+                            token: token,
+                        });
+                    }
+                }
+                });
             }
-        }
-        });
+        })
     };
 
     deleteUser = (req, res) => {
@@ -64,29 +69,60 @@ class UserController {
     };
 
     addPhoto = (req, res) => {
-        console.log(req)
         const objToken = new TokenController();
         let user = jwt.decode(objToken.getToken(req), config.privateKey);
-        Photo.create(
-        {
-            photoname: req.file.originalname,
-            path: `storage/img/${req.file.filename}`,
-            photourl: `${config.url}user/${req.file.originalname}`,
-            mimetype: req.file.mimetype,
-            created: new Date(),
-            user_id: user.user._id,
-        },
-        (err, photo) => {
-            console.log(photo);
-            if (!err) {
-            photo.save();
-            res.status(201).json({ message: "photo added", photo });
+        Photo.deleteOne({ user_id: user.user._id }, (err, photoRemoved) => {
+            if(photoRemoved) {
+                Photo.create(
+                {
+                    photoname: req.file.originalname,
+                    path: `storage/img/${req.file.filename}`,
+                    photourl: `${config.url}user/${req.file.originalname}`,
+                    mimetype: req.file.mimetype,
+                    created: new Date(),
+                    user_id: user.user._id,
+                },
+                (err, photo) => {
+                    console.log(photo);
+                    if (!err) {
+                    photo.save();
+                    res.status(201).json({ message: "photo added", photo });
+                    } else {
+                    console.log(photo);
+                    res.status(500).json({ message: "error", err });
+                    }
+                }
+            );
             } else {
-            console.log(photo);
-            res.status(500).json({ message: "error", err });
+                Photo.create(
+                    {
+                    photoname: req.file.originalname,
+                    path: `storage/img/${req.file.filename}`,
+                    photourl: `${config.url}user/${req.file.originalname}`,
+                    mimetype: req.file.mimetype,
+                    created: new Date(),
+                    user_id: user.user._id,
+                    },
+                    (err, photo) => {
+                    console.log(photo);
+                    if (!err) {
+                        photo.save();
+                        res
+                        .status(201)
+                        .json({
+                            message: "photo added",
+                            photo,
+                        });
+                    } else {
+                        console.log(photo);
+                        res
+                        .status(500)
+                        .json({ message: "error", err });
+                    }
+                    }
+                );
             }
-        }
-    );
+        })
     };
 }
 
