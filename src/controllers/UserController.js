@@ -13,33 +13,38 @@ class UserController {
         let token = objToken.getToken(req);
         let user = req.body;
         let id = req.params.id;
-        console.log(user);
-        console.log(id);
-        console.log(token);
+
         Photo.findOne({user_id: id}, (err, data) => {
             if(data) {
                 user.picture =data.photourl
-                User.findByIdAndUpdate(id, user, { new: true }, (err, userUpdated) => {
-                if (err) {
-                    res.status(500).send({
-                    message: "Error al actualizar el usuario",
-                    });
-                } else {
-                    if (!userUpdated) {
-                        res.status(404).send({
-                            message: "No se ha podido actualizar el usuario",
-                        });
-                    } else {
-                        token = jwt.sign({ user: userUpdated }, config.privateKey, {
-                            expiresIn: moment().add(14, "days").unix(),
-                        });
-                        res.status(200).send({
-                            message: "user updated",
-                            token: token,
-                        });
-                    }
+                if (user.password !== "" || user.password !== undefined) {
+                    bcrypt.genSalt(10, (err, salt) => {
+                        bcrypt.hash(user.password, salt, (err, hash) => {
+                            user.password = hash;
+                            User.findByIdAndUpdate(id, user, { new: true }, (err, userUpdated) => {
+                            if (err) {
+                                res.status(500).send({
+                                message: "Error al actualizar el usuario",
+                                });
+                            } else {
+                                if (!userUpdated) {
+                                    res.status(404).send({
+                                        message: "No se ha podido actualizar el usuario",
+                                    });
+                                } else {
+                                    token = jwt.sign({ user: userUpdated }, config.privateKey, {
+                                        expiresIn: moment().add(14, "days").unix(),
+                                    });
+                                    res.status(200).send({
+                                        message: "user updated",
+                                        token: token,
+                                    });
+                                }
+                            }
+                            });
+                        })
+                    })
                 }
-                });
             }
         })
     };
