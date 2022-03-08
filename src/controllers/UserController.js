@@ -10,7 +10,7 @@ const TokenController = require( "./TokenController" );
 class UserController {
     updateUser = (req, res) => {
         const objToken = new TokenController();
-        let token = objToken.getToken(req);
+        let token = objToken.getToken(req,res);
         let user = req.body;
         let id = req.params.id;
 
@@ -79,7 +79,7 @@ class UserController {
 
     addPhoto = (req, res) => {
         const objToken = new TokenController();
-        let user = jwt.decode(objToken.getToken(req), config.privateKey);
+        let user = jwt.decode(objToken.getToken(req,res), config.privateKey);
         Photo.deleteOne({ user_id: user.user._id }, (err, photoRemoved) => {
             if(photoRemoved) {
                 Photo.create(
@@ -136,8 +136,8 @@ class UserController {
 
     getUser = (req, res) => {
         const objToken = new TokenController();
-        let user = objToken.verifyToken(req);
-        User.findById(user._id, (err, user) => {
+        let user = objToken.verifyToken(req,res);
+        User.findById(user.user._id, (err, user) => {
             if (err) {
             res.status(500).send({
                 message: "Error al devolver los datos",

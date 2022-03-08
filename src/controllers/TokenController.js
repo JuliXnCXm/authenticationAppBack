@@ -10,10 +10,7 @@ class TokenController {
         let token = this.getToken(req);
         let decode = jwt.verify(token, config.privateKey);
         if (decode.user != null) {
-            res.status(200).send({
-                message: "Token valido",
-                user: decode.user
-            })
+            return decode
         } else {
             res.status(401).send({
                 message: 'Token is not valid'
