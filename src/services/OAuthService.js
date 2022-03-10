@@ -53,7 +53,9 @@ class OAuthService {
         const query = new URLSearchParams({
             access_token: JSON.parse(body).access_token,
         });
-        res.redirect(`/oauth/${this.state}/user?${query}`);
+        res.redirect(
+            `/oauth/${this.state}/user?${query}`
+        );
         });
     };
 
@@ -90,7 +92,7 @@ class OAuthService {
                     {
                         expiresIn: moment().add(14, "days").unix(),
                     });
-                    res.status(200).send({msg: "user logged", token: token});
+                    res.redirect(`${config.clientSideUrl}oauth/login/user?access_token=${token}`);
                 } else {
                     res.status(401).json({
                         error: err,

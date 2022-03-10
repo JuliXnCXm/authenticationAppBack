@@ -56,7 +56,7 @@ class AuthService {
                                         expiresIn: moment().add(14, "days").unix(),
                                     }
                                 );
-                                res.status(200).json({
+                                res.status(201).json({
                                     message: "Usuario creado",
                                     token: token,
                                 })
