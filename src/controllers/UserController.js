@@ -83,28 +83,30 @@ class UserController {
         let user = jwt.decode(objToken.getToken(req,res), config.privateKey);
         Photo.deleteOne({ user_id: user.user._id }, (err, photoRemoved) => {
             if(photoRemoved) {
-                fs.unlink(path.join(__dirname, `/../storage/img/${req.file.filename}`), (err) => {
-
-                    Photo.create(
-                        {
-                    photoname: req.file.originalname,
-                    path: `storage/img/${req.file.filename}`,
-                    photourl: `${config.url}user/${req.file.originalname}`,
-                    mimetype: req.file.mimetype,
-                    created: new Date(),
-                    user_id: user.user._id,
-                },
-                (err, photo) => {
-                    console.log(photo);
-                    if (!err) {
-                        photo.save();
-                        res.status(201).json({ message: "photo added", photo });
-                    } else {
+                console.log(req)
+                console.log(photoRemoved)
+                fs.unlink(path.join(__dirname, `/../storage/img/${photoRemoved.photoname}`), (err) => {
+                    if(!err){
+                        Photo.create({
+                        photoname: req.file.originalname,
+                        path: `storage/img/${req.file.filename}`,
+                        photourl: `${config.url}user/${req.file.originalname}`,
+                        mimetype: req.file.mimetype,
+                        created: new Date(),
+                        user_id: user.user._id,
+                    },
+                    (err, photo) => {
                         console.log(photo);
-                        res.status(500).json({ message: "error", err });
+                        if (!err) {
+                            photo.save();
+                            res.status(201).json({ message: "photo added", photo });
+                        } else {
+                            console.log(photo);
+                            res.status(500).json({ message: "error", err });
+                        }
                     }
-                }
                 );
+                }
             })
             } else {
                 Photo.create(
