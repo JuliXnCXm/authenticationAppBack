@@ -9,6 +9,7 @@ const TokenController = require( "./TokenController" );
 const fs = require("fs");
 
 class UserController {
+
     updateUser = (req, res) => {
         const objToken = new TokenController();
         let token = objToken.getToken(req,res);
@@ -16,39 +17,36 @@ class UserController {
         let id = req.params.id;
 
         Photo.findOne({user_id: id}, (err, data) => {
-            console.log(data);
             if(data) {
                 user.picture =data.photourl
-                if (user.password !== "" || user.password !== undefined) {
+                if (user.password || user.password !== "" || user.password !== undefined) {
                     bcrypt.genSalt(10, (err, salt) => {
                         bcrypt.hash(user.password, salt, (err, hash) => {
                             user.password = hash;
-                            User.findByIdAndUpdate(id, user, { new: true }, (err, userUpdated) => {
-                            console.log(userUpdated);
-                            console.log(err);
-                            if (err) {
-                                res.status(500).send({
-                                message: "Error al actualizar el usuario",
-                                });
-                            } else {
-                                if (!userUpdated) {
-                                    res.status(404).send({
-                                        message: "No se ha podido actualizar el usuario",
-                                    });
-                                } else {
-                                    token = jwt.sign({ user: userUpdated }, config.privateKey, {
-                                        expiresIn: moment().add(14, "days").unix(),
-                                    });
-                                    res.status(200).send({
-                                        message: "user updated",
-                                        token: token,
-                                    });
-                                }
-                            }
-                            });
                         })
                     })
                 }
+                User.findByIdAndUpdate(id, user, { new: true }, (err, userUpdated) => {
+                if (err) {
+                    res.status(500).send({
+                    message: "Error al actualizar el usuario",
+                    });
+                } else {
+                    if (!userUpdated) {
+                        res.status(404).send({
+                            message: "No se ha podido actualizar el usuario",
+                        });
+                    } else {
+                        token = jwt.sign({ user: userUpdated }, config.privateKey, {
+                            expiresIn: moment().add(14, "days").unix(),
+                        });
+                        res.status(200).send({
+                            message: "user updated",
+                            token: token,
+                        });
+                    }
+                }
+                });
             }
         })
     };
@@ -84,7 +82,6 @@ class UserController {
     addPhoto = (req, res) => {
         const objToken = new TokenController();
         let user = jwt.decode(objToken.getToken(req,res), config.privateKey);
-        console.log(req.file.originalname)
         Photo.deleteOne({ user_id: user.user._id }, (err, photoRemoved) => {
             if (Object.keys(photoRemoved).length > 1) {
                 console.log("ddd");
