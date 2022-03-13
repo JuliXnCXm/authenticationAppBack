@@ -14,38 +14,50 @@ class UserController {
         const objToken = new TokenController();
         let token = objToken.getToken(req,res);
         let user = req.body;
-        let id = req.params.id;
-
         if (user.password || user.password !== "" || user.password !== undefined) {
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(user.password, salt, (err, hash) => {
-                    user.password = hash;
+                    user.password = hash
+                    return this.findAndUpdate(req, res, req.params.id, user, token);
                 })
             })
-        }
-        console.log(user);
-        User.findByIdAndUpdate(id, user, { new: true }, (err, userUpdated) => {
-        if (err) {
-            res.status(500).send({
-            message: "Error al actualizar el usuario",
-            });
         } else {
-            if (!userUpdated) {
-                res.status(404).send({
-                    message: "No se ha podido actualizar el usuario",
+            return this.findAndUpdate(res, res, req.params.id, req.body, token);
+        }
+    };
+
+    findAndUpdate = (req,res ,id, user,token) => {
+        User.findByIdAndUpdate(
+            id,
+            user,
+            { new: true },
+            (err, userUpdated) => {
+            if (err) {
+                return res.status(500).send({
+                message: "Error al actualizar el usuario",
                 });
             } else {
-                token = jwt.sign({ user: userUpdated }, config.privateKey, {
-                    expiresIn: moment().add(14, "days").unix(),
-                });
-                res.status(200).send({
-                    message: "user updated",
-                    token: token,
-                });
+                if (!userUpdated) {
+                    return res.status(404).send({
+                        message: "No se ha podido actualizar el usuario",
+                    });
+                } else {
+                    token = jwt.sign(
+                        { user: userUpdated },
+                        config.privateKey,
+                        {
+                        expiresIn: moment().add(14, "days").unix(),
+                        }
+                    );
+                    return res.status(200).send({
+                        message: "user updated",
+                        token: token,
+                    });
+                }
             }
-        }
-        });
-    };
+            }
+        );
+    }
 
     deleteUser = (req, res) => {
         let id = req.params.id;
@@ -75,6 +87,41 @@ class UserController {
         res.sendFile(path.join(__dirname, `/../storage/img/${photoname}`));
     };
 
+    createPhoto = async (req, res,user) => {
+        Photo.create(
+            {
+            photoname: req.file.originalname,
+            path: `storage/img/${req.file.filename}`,
+            photourl: `${config.url}user/${req.file.originalname}`,
+            mimetype: req.file.mimetype,
+            created: new Date(),
+            user_id: user.user._id,
+            },
+            (err, photo) => {
+            if (!err) {
+                photo.save();
+                User.findByIdAndUpdate(
+                user.user._id,
+                { picture: photo.photourl },
+                { new: true },
+                (err, userUpdated) => {
+                    if (!err) {
+                    return res.status(201).send({
+                        message: "Photo updated",
+                        user: userUpdated,
+                    });
+                    }
+                }
+                );
+            } else {
+                return res
+                .status(500)
+                .json({ message: "error", err });
+            }
+            }
+        );
+    }
+
     addPhoto = (req, res) => {
         const objToken = new TokenController();
         let user = jwt.decode(objToken.getToken(req,res), config.privateKey);
@@ -87,62 +134,12 @@ class UserController {
                     ),
                     (err) => {
                     if (!err) {
-                        Photo.create(
-                        {
-                            photoname: req.file.originalname,
-                            path: `storage/img/${req.file.filename}`,
-                            photourl: `${config.url}user/${req.file.originalname}`,
-                            mimetype: req.file.mimetype,
-                            created: new Date(),
-                            user_id: user.user._id,
-                        },
-                        (err, photo) => {
-                            if (!err) {
-                            photo.save();
-                            User.findByIdAndUpdate(user.user._id, { picture: photo.photourl }, { new: true }, (err, userUpdated) => {
-                                if (!err) {
-                                res.status(201).send({
-                                    message: "Photo updated",
-                                    user: userUpdated,
-                                });
-                                }
-                            });
-                            } else {
-                            res.status(500).json({ message: "error", err });
-                            }
-                        }
-                        );
+                        return this.createPhoto(req,res,user)
                     }
-                    }
+                }
                 );
-                } else {
-                Photo.create(
-                    {
-                    photoname: req.file.originalname,
-                    path: `storage/img/${req.file.filename}`,
-                    photourl: `${config.url}user/${req.file.originalname}`,
-                    mimetype: req.file.mimetype,
-                    created: new Date(),
-                    user_id: user.user._id,
-                    },
-                    (err, photo) => {
-                    if (!err) {
-                        photo.save();
-                        User.findByIdAndUpdate(user.user._id, {picture: photo.photourl}, { new: true }, (err, userUpdated) => {
-                            if (!err) {
-                                res.status(201).send({
-                                message:
-                                    "Photo updated",
-                                user: userUpdated,
-                                });
-                            }
-                            }
-                        );
-                    } else {
-                        res.status(500).json({ message: "error", err });
-                    }
-                    }
-                );
+            } else {
+                    return this.createPhoto(req,res,user)
             }
         })
     };
