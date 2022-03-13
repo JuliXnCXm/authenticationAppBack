@@ -14,7 +14,9 @@ class AuthService {
     login = (req, res) => {
         let user = req.body;
         this.provider = "local";
+        console.log(req);
         User.findOne({ email: user.email }, (err, data) => {
+            console.log(data);
             if (!data) {
             res.status(404).send({
                 message: "Error al obtener usuario o usuario no encontrado",
