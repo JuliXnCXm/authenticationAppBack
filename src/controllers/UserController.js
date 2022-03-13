@@ -16,6 +16,7 @@ class UserController {
         let id = req.params.id;
 
         Photo.findOne({user_id: id}, (err, data) => {
+            console.log(data);
             if(data) {
                 user.picture =data.photourl
                 if (user.password !== "" || user.password !== undefined) {
@@ -23,6 +24,8 @@ class UserController {
                         bcrypt.hash(user.password, salt, (err, hash) => {
                             user.password = hash;
                             User.findByIdAndUpdate(id, user, { new: true }, (err, userUpdated) => {
+                            console.log(userUpdated);
+                            console.log(err);
                             if (err) {
                                 res.status(500).send({
                                 message: "Error al actualizar el usuario",
@@ -81,34 +84,43 @@ class UserController {
     addPhoto = (req, res) => {
         const objToken = new TokenController();
         let user = jwt.decode(objToken.getToken(req,res), config.privateKey);
+        console.log(req.file.originalname)
         Photo.deleteOne({ user_id: user.user._id }, (err, photoRemoved) => {
-            if(photoRemoved) {
-                console.log(req)
-                console.log(photoRemoved)
-                fs.unlink(path.join(__dirname, `/../storage/img/${photoRemoved.photoname}`), (err) => {
-                    if(!err){
-                        Photo.create({
-                        photoname: req.file.originalname,
-                        path: `storage/img/${req.file.filename}`,
-                        photourl: `${config.url}user/${req.file.originalname}`,
-                        mimetype: req.file.mimetype,
-                        created: new Date(),
-                        user_id: user.user._id,
-                    },
-                    (err, photo) => {
-                        console.log(photo);
-                        if (!err) {
+            if (Object.keys(photoRemoved).length > 1) {
+                console.log("ddd");
+                fs.unlink(
+                    path.join(
+                    __dirname,
+                    `/../storage/img/${photoRemoved.photoname}`
+                    ),
+                    (err) => {
+                    if (!err) {
+                        Photo.create(
+                        {
+                            photoname: req.file.originalname,
+                            path: `storage/img/${req.file.filename}`,
+                            photourl: `${config.url}user/${req.file.originalname}`,
+                            mimetype: req.file.mimetype,
+                            created: new Date(),
+                            user_id: user.user._id,
+                        },
+                        (err, photo) => {
+                            console.log(photo);
+                            if (!err) {
                             photo.save();
-                            res.status(201).json({ message: "photo added", photo });
-                        } else {
+                            res
+                                .status(201)
+                                .json({ message: "photo added", photo });
+                            } else {
                             console.log(photo);
                             res.status(500).json({ message: "error", err });
+                            }
                         }
+                        );
+                    }
                     }
                 );
-                }
-            })
-            } else {
+                } else {
                 Photo.create(
                     {
                     photoname: req.file.originalname,
@@ -122,17 +134,13 @@ class UserController {
                     console.log(photo);
                     if (!err) {
                         photo.save();
-                        res
-                        .status(201)
-                        .json({
-                            message: "photo added",
-                            photo,
+                        res.status(201).json({
+                        message: "photo added",
+                        photo,
                         });
                     } else {
                         console.log(photo);
-                        res
-                        .status(500)
-                        .json({ message: "error", err });
+                        res.status(500).json({ message: "error", err });
                     }
                     }
                 );
