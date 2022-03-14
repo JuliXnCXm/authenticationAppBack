@@ -129,7 +129,7 @@ class OAuthService {
                                             .unix(),
                                         }
                                         );
-                                    res.redirect(`${config.clientSideUrl}oauth/login/user?access_token=${token}`
+                                    res.redirect(`${config.clientSideUrl}oauth/register/user?access_token=${token}`
                                     );
                                 } else {
                                     res.redirect(`${config.clientSideUrl}`);
