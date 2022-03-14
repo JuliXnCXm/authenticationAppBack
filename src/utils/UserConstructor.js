@@ -27,7 +27,7 @@ UserConstructor = (objUser, provider, hash) => {
         case "twitter":
             userObj.name = objUser.name;
             userObj.lastname = objUser.username;
-            userObj.email = objUser.email;
+            userObj.email = `lorem@gmail.com`;
             userObj.description = objUser.description;
             userObj.picture = objUser.profile_image_url;
             break;
