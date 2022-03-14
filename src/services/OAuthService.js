@@ -117,7 +117,7 @@ class OAuthService {
             let { error , value} = UserSchema.validate(userInfo);
             if (value) {
                 User.findOne({ email: value.email,provider:this.provider }, (err, user) => {
-                    if (!err && user) {
+                    if (!user) {
                             User.create(value, (err, user) => {
                                 if (!err) {
                                     let token = jwt.sign(
