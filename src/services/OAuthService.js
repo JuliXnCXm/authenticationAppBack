@@ -86,7 +86,7 @@ class OAuthService {
 
         try {
             const userExchanged = await this.exchangeToken(req.query.access_token);
-            User.findOne({ email: userExchanged.email }, (err, user) => {
+            User.findOne({ email: userExchanged.email, provider: this.provider }, (err, user) => {
                 if (!err) {
                     let token = jwt.sign({ user: user }, config.privateKey,
                     {
@@ -116,9 +116,8 @@ class OAuthService {
             let userInfo = UserConstructor(userExchanged, this.provider);
             let { error , value} = UserSchema.validate(userInfo);
             if (value) {
-                User.findOne({ email: value.email }, (err, user) => {
-                    if (!err) {
-                        if (!user) {
+                User.findOne({ email: value.email,provider:this.provider }, (err, user) => {
+                    if (!err && user) {
                             User.create(value, (err, user) => {
                                 if (!err) {
                                     let token = jwt.sign(
@@ -130,29 +129,14 @@ class OAuthService {
                                             .unix(),
                                         }
                                         );
-                                    res.status(200).json({
-                                        msg: "user created",
-                                        token: token
-                                    });
+                                    res.redirect(`${config.clientSideUrl}oauth/login/user?access_token=${token}`
+                                    );
                                 } else {
-                                    res.status(401).json({
-                                    error: err,
-                                    msg: "Error al crear el usuario o usuario ya existente",
-                                    });
-
+                                    res.redirect(`${config.clientSideUrl}`);
                                 }
                             });
-                        } else {
-                            res.status(401).json({
-                                error: err,
-                                msg:"Error al obtener usuario o usuario no encontrado"
-                            })
-                        }
                     } else {
-                        res.status(401).json({
-                            error: err,
-                            msg:"Error al obtener usuario o usuario no encontrado"
-                        })
+                        res.redirect(`${config.clientSideUrl}`);
                     }
                 })
 
