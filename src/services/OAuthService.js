@@ -137,7 +137,8 @@ class OAuthService {
                                 }
                             });
                     } else {
-                        res.send("primer nivel");
+                        res.json({err: err,
+                            user: user});
                     }
                 })
 
