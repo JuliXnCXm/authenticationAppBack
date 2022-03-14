@@ -119,7 +119,7 @@ class OAuthService {
                 User.findOne({ email: value.email,provider:this.provider }, (err, user) => {
                     if (!user) {
                             User.create(value, (err, user) => {
-                                if (!err) {
+                                if (user && user !== undefined) {
                                     let token = jwt.sign(
                                         { user: user },
                                         config.privateKey,
