@@ -132,13 +132,11 @@ class OAuthService {
                                     res.redirect(`${config.clientSideUrl}oauth/register/user?access_token=${token}`
                                     );
                                 } else {
-                                    // res.redirect(`${config.clientSideUrl}`);
-                                    res.send("segundo nivel")
+                                    res.redirect(`${config.clientSideUrl}`);
                                 }
                             });
-                    } else {
-                        res.json({err: err,
-                            user: user});
+                        } else {
+                        res.redirect(`${config.clientSideUrl}`);
                     }
                 })
 
