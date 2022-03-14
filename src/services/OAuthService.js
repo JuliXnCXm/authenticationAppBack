@@ -94,14 +94,12 @@ class OAuthService {
                     });
                     res.redirect(`${config.clientSideUrl}oauth/login/user?access_token=${token}`);
                 } else {
-                    res.status(401).json({
-                        error: err,
-                        msg:"Error al obtener usuario o usuario no encontrado"
-                    })
+                    res.redirect(`${config.clientSideUrl}/message`);
                 }
             });
         } catch (error) {
             next(boom.badRequest(error));
+            res.redirect(`${config.clientSideUrl}/message`);
         }
     };
 
@@ -132,11 +130,11 @@ class OAuthService {
                                     res.redirect(`${config.clientSideUrl}oauth/register/user?access_token=${token}`
                                     );
                                 } else {
-                                    res.redirect(`${config.clientSideUrl}`);
+                                    res.redirect(`${config.clientSideUrl}/message`);
                                 }
                             });
                         } else {
-                        res.redirect(`${config.clientSideUrl}`);
+                        res.redirect(`${config.clientSideUrl}/message`);
                     }
                 })
 
